@@ -18,7 +18,11 @@ function go() {
 	var url_two = base_url + num_two + '/' + name_two;
 
 	// Request Data
-	
+	scrapeServer(url, name);
+	scrapeServer(url_two, name_two, writeToFile);
+};
+
+function scrapeServer(url, name, callback) {
 	request(url, function(err, resp, body) {
 	// Check for Error
 		if (err)
@@ -40,34 +44,10 @@ function go() {
 		dataObj[formatted_name].protein = data[6];
 
 		// Callback
-		writeToFile();
+		if (callback)
+			callback();
 	});
-	/*request(url, function(err, resp, body) {
-	// Check for Error
-		if (err)
-		  console.log(err);
-
-		// Retrieve data from body
-		var $ = cheerio.load(body);
-		var data = [];
-		$('.nutrition-table tbody tr td').each(function(nutrition) {
-	   data.push($(this).text().replace(/[^0-9.]/g, ''));
-		});
-		var formatted_name = name.replace(/[+]/g, '_');
-
-		// Put Data into JSON
-		dataObj[formatted_name] = {};
-		dataObj[formatted_name].kcal = data[0];
-		dataObj[formatted_name].fats = data[2];
-		dataObj[formatted_name].carbs = data[4];
-		dataObj[formatted_name].protein = data[6];
-
-		// Callback
-		writeToFile();
-	});*/
 };
-
-
 
 function writeToFile() {
 	// Stringify and save dataObj to file
@@ -83,5 +63,5 @@ function readFromFile() {
 	});
 };
 
-go();
-//readFromFile();
+//go();
+readFromFile();
