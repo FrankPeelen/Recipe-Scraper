@@ -12,7 +12,10 @@ function go() {
 	// Find Link
 	var num = 26620;
 	var name = 'vegiladas+with+rice+and+corn+salad';
+	var num_two = 27971;
+	var name_two = 'vegetable+filo+spring+rolls';
 	var url = base_url + num + '/' + name;
+	var url_two = base_url + num_two + '/' + name_two;
 
 	// Request Data
 	
@@ -22,10 +25,10 @@ function go() {
 		  console.log(err);
 
 		// Retrieve data from body
-		var body = cheerio.load(body);
+		var $ = cheerio.load(body);
 		var data = [];
-		body('.nutrition-table tbody tr td').each(function(nutrition) {
-	   data.push(body(this).text().replace(/[^0-9.]/g, ''));
+		$('.nutrition-table tbody tr td').each(function(nutrition) {
+	   data.push($(this).text().replace(/[^0-9.]/g, ''));
 		});
 		var formatted_name = name.replace(/[+]/g, '_');
 
@@ -39,6 +42,29 @@ function go() {
 		// Callback
 		writeToFile();
 	});
+	/*request(url, function(err, resp, body) {
+	// Check for Error
+		if (err)
+		  console.log(err);
+
+		// Retrieve data from body
+		var $ = cheerio.load(body);
+		var data = [];
+		$('.nutrition-table tbody tr td').each(function(nutrition) {
+	   data.push($(this).text().replace(/[^0-9.]/g, ''));
+		});
+		var formatted_name = name.replace(/[+]/g, '_');
+
+		// Put Data into JSON
+		dataObj[formatted_name] = {};
+		dataObj[formatted_name].kcal = data[0];
+		dataObj[formatted_name].fats = data[2];
+		dataObj[formatted_name].carbs = data[4];
+		dataObj[formatted_name].protein = data[6];
+
+		// Callback
+		writeToFile();
+	});*/
 };
 
 
