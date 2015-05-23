@@ -1,48 +1,44 @@
+"use strict"
+
 var request = require('request');
 var cheerio = require('cheerio');
+var fs = require("fs");
+var filename = 'recipes.txt'
 
-function saveInfoToFile(str) {
-	if (str) { console.log("yo") };
-	var kcal;
-	var fats;
-	var carbs;
-	var protein;
-	// Find Data
-	//var nutrition_table = str.split("nutrition-table")[1].split("/table")[0];
-	//var energy = nutrition_table.split("Energy")[1].split("/td")[0];
-	//var fats = nutrition_table.split("Fat Total")[1].split("/td")[0];
-	//var carbs = nutrition_table.split("Carbohydrate Total")[1].split("/td")[0];
-	//var protein = nutrition_table.split("Protein")[1].split("/td")[0];
-	//console.log(energy);
-	//console.log(fats);
-	//console.log(carbs);
-	//console.log(protein);
-	// Save Data
-
-};
-
-function scrape() {
-	// Get Data
-
-	// Save to File
-	go();
-};
+var dataObj = {};
+var base_url = 'http://www.taste.com.au/recipes/';
 
 function go() {
-	var url = 'http://www.taste.com.au/recipes/26620/vegiladas+with+rice+and+corn+salad';
+	// Find Data
+	var num = 26620;
+	var name = 'vegiladas+with+rice+and+corn+salad';
+	var url = base_url + num + '/' + name;
 	request(url, function(err, resp, body) {
 	  if (err)
 	    throw err;
-	  $ = cheerio.load(body);
-	  $('.nutrition-table tbody tr td').each(function(nutrition) {
-    	arr = $(this).text().replace(/[^0-9.]/g, '');
-    	//one = arr[0];
-    	//two = arr[1];
-    	console.log(arr);
-    	//console.log('one: ' + one);
-    	//console.log('two: ' + two);
+	  var body = cheerio.load(body);
+	  var data = [];
+	  body('.nutrition-table tbody tr td').each(function(nutrition) {
+    	data.push(body(this).text().replace(/[^0-9.]/g, ''));
 		});
+		var formatted_name = name.replace(/[+]/g, '_');
+		dataObj[formatted_name] = {};
+	  dataObj[formatted_name].kcal = data[0];
+	  dataObj[formatted_name].fats = data[2];
+	  dataObj[formatted_name].carbs = data[4];
+	  dataObj[formatted_name].protein = data[6];
+	  var parsed_data = JSON.stringify(dataObj);
+	  fs.appendFile(filename, parsed_data);
 	});
 };
 
-scrape();
+function readFromFile() {
+	fs.readFile(filename, function (err, data) {
+  if (err) throw err;
+  	var read = JSON.parse(data);
+  	console.log(read);
+	});
+};
+
+go();
+//readFromFile();
